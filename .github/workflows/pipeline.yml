@@ -1,0 +1,88 @@
+name: CI-CD
+
+on:
+  push:
+    branches:
+      - develop
+      - main
+    pull_request:
+      branches:
+        - develop
+        - main
+
+  workflow_dispatch:
+
+jobs:
+  build_and_test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Use Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18.x'
+
+      - name: Install dependency
+        run: npm ci
+
+      - name: App Build
+        run: npm run build
+
+  Development:
+    name: Deploy to Development
+
+    needs: build_and_test
+
+    runs-on: ubuntu-latest
+
+    environment:
+      name: 'Development'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Use Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18.x'
+
+      - name: Install dependency
+        run: npm ci
+
+      - name: App Build
+        run: npm run build
+
+      - name: Deploy to DEV
+        run: echo " Deploy to develop..."
+
+  Production:
+    name: Deploy to Production
+
+    needs: Development
+
+    runs-on: ubuntu-latest
+
+    environment:
+      name: 'Production'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Use Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18.x'
+
+      - name: Install dependency
+        run: npm ci
+
+      - name: App Build
+        run: npm run build
+
+      - name: Deploy to PRODUCTION
+        run: echo " Deploy to PRODUCTION..."
